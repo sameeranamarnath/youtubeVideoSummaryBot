@@ -7,11 +7,6 @@ import { OpenAIEmbeddings } from "langchain/embeddings/openai";
 import { CharacterTextSplitter } from "langchain/text_splitter";
 import path from "path";
 
-/**
- *
- * WARNING: THIS IS THE SOLUTION! Please try coding before viewing this.
- *
- */
 
 // First, we'll initialize the chain and the chat history so that they can be preserved on multiple calls to the API
 let chain;
@@ -39,10 +34,7 @@ const initializeChain = async (initialPrompt, transcript) => {
     console.log(`Loading data ${docs[0]}`);
 
     // Upload chunks to database as documents
-    // We'll be using HNSWLib for this one.
-    // The nice thing about this one is that we don't need to create any accounts or get any API keys besides our OpenAI key to use this library
-    // So I find that it's nice for doing some quick prototyping.
-    // But the downside is that you don't get the nice dashboard like we had in Pinecone.
+    // We'll be using HNSWLib an in memory vectordb 
     const vectorStore = await HNSWLib.fromDocuments(
       [{ pageContent: transcript }],
       new OpenAIEmbeddings()
@@ -62,9 +54,8 @@ const initializeChain = async (initialPrompt, transcript) => {
 
     // The ConversationalRetrievalQA chain builds on RetrievalQAChain to provide a chat history component.
 
-    // To create one, you will need a retriever. In the below example, we will create one from a vectorstore, which can be created from embeddings.
-
-    // Remember we can use the loadedVectorStore or the vectorStore, in case for example you want to scale this application up and use the same vector store to store multiple Youtube transcripts.
+    
+    // We can use the existing vector store or build one per instantiation
     chain = ConversationalRetrievalQAChain.fromLLM(
       model,
       vectorStore.asRetriever(),
@@ -92,7 +83,6 @@ const initializeChain = async (initialPrompt, transcript) => {
 
 export default async function handler(req, res) {
   if (req.method === "POST") {
-    // DO THIS FIRST
     // First we'll destructure the prompt and firstMsg from the POST request body
     const { prompt } = req.body;
     const { firstMsg } = req.body;
@@ -102,7 +92,7 @@ export default async function handler(req, res) {
       console.log("Initializing chain");
 
       try {
-        // So first of all, we want to give it our human message, which was to ask for a summary of the YouTube URL
+        //get  a summary of the youtube transcript
         const initialPrompt = `Give me a summary of the transcript: ${prompt}`;
 
         chatHistory.push({
@@ -110,8 +100,7 @@ export default async function handler(req, res) {
           content: initialPrompt,
         });
 
-        // Here, we'll use a generic YouTube Transcript API to get the transcript of a youtube video
-        // As you can see, the Transcript takes videoId/videoURL has the first argument to the function
+       //get video transcript based on scraping
         const transcriptResponse = await YoutubeTranscript.fetchTranscript(
           prompt
         );
@@ -125,8 +114,7 @@ export default async function handler(req, res) {
 
         console.log({ transcriptResponse });
 
-        // We can see that it's a big array of lines. Let's squish it down into one string first to make it easier to use.
-
+      
         // We initialize the transcript string
         let transcript = "";
 
@@ -137,13 +125,12 @@ export default async function handler(req, res) {
           transcript += line.text;
         });
 
-        // Now, let's create a separate function called initialize chain
         // We'll pass in the first prompt and the context, in this case the transcript
         const response = await initializeChain(initialPrompt, transcript);
         console.log("Chain:", chain);
         console.log(response);
 
-        // And then we'll jsut get the response back and the chatHistory
+        // get the response back and the chatHistory
         return res.status(200).json({ output: response, chatHistory });
       } catch (err) {
         console.error(err);
@@ -152,7 +139,6 @@ export default async function handler(req, res) {
           .json({ error: "An error occurred while fetching transcript" });
       }
 
-      // DO THIS THIRD
     } else {
       // If it's not the first message, we can chat with the bot
       console.log("Received question");

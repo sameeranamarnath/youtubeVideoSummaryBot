@@ -4,11 +4,9 @@ import React, { useState } from "react";
 import PageHeader from "./components/PageHeader";
 import PromptBox from "./components/PromptBox";
 import ResultWithSources from "./components/ResultWithSources";
-import Title from "./components/Title";
 import TwoColumnLayout from "./components/TwoColumnLayout";
 
 const VideoChatUI = () => {
-  // We'll set a default YouTube video so we don't have to copy and paste this every time
   const [prompt, setPrompt] = useState(
     ""
   );
@@ -18,7 +16,7 @@ const VideoChatUI = () => {
   // And we'll set an initial message as well, to make the UI look a little nicer.
   const [messages, setMessages] = useState([
     {
-      text: `Hi there! Please provide a YouTube video URL to a relatively short video and I'll answer any questions you have based on the video.
+      text: `Please provide a YouTube video URL to a relatively short video and I'll answer any questions you have based on the video.
                 `,
       type: "bot",
     },
@@ -28,7 +26,6 @@ const VideoChatUI = () => {
     setPrompt(e.target.value);
   };
 
-  // The only differences here will be the "URL" for the api call
   // And the body will send a prompt as well as a firstMsg, which tells us if its the first message in the chat or not
   // Because the first message will tell us to create the YouTube Chat bot
   const handleSubmit = async () => {

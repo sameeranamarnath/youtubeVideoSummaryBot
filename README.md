@@ -1,7 +1,8 @@
 Langchain HNWSLib based chatbot which retrieves the transcript of a given youtube
 url and answers questions only based on the relevant video.
 
-Uses the YouTube transcript api unofficial, Text Splitters, and the Conversational Retrieval QA CHain
+Click the pic to see it in action:
+[![Sample of the working app:](https://github.com/sameeranamarnath/youtubeVideoSummaryBot/assets/85400557/646d7092-85d6-47b9-b2f9-e51348b96e91)](https://clipchamp.com/watch/w4mao2IgjnT)
 
 Current limitation:
 if the youtube video has a short transcript, the bot works fine, this has to do with the
@@ -25,5 +26,4 @@ npm install
 
 Then, run the development server:
 npm run dev
-
-Open [http: //localhost :3000](http: //localhost :3000) with your browser to see the app.
+runs on localhost:3000

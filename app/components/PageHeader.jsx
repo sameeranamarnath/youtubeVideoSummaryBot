@@ -1,6 +1,5 @@
 import React from "react";
-import { pressStart2P, instrumentSans } from "../styles/fonts";
-import { sourceCodePro } from "../styles/fonts";
+import { sourceCodePro, instrumentSans } from "../styles/fonts";
 const PageHeader = ({ heading, boldText, description }) => {
   return (
     <>
